@@ -1,2 +1,2 @@
 
-![Top Langs](./profile/toplangs.svg)
+![Top Langs](./profile/top-langs.svg)
