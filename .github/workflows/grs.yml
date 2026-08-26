@@ -15,12 +15,12 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Generate stats card
-        uses: stats-organization/github-readme-stats-action@v2
+      - name: Generate top-langs card
+        uses: stats-organization/github-readme-top-langs-action@v2
         with:
           card: stats
           options: username=${{ github.repository_owner }}&show_icons=true
-          path: profile/stats.svg
+          path: profile/top-langs.svg
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Commit cards
