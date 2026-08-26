@@ -1,0 +1,59 @@
+name: Update Private README Cards
+
+on:
+  schedule:
+    - cron: "30 0 * * *"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      # Prüfen, ob der PAT private Repositories sehen kann
+      - name: Test GitHub Token
+        env:
+          GH_TOKEN: ${{ secrets.GH_STATS_TOKEN }}
+        run: |
+          echo "GitHub account:"
+          curl -fsSL \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/user \
+            | jq '{login, type}'
+
+          echo ""
+          echo "Repositories visible to GH_STATS_TOKEN:"
+          curl -fsSL \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/user/repos?visibility=all&per_page=100" \
+            | jq -r '.[] | "\(.private)\t\(.full_name)"'
+
+      # Top Languages mit PAT generieren
+      - name: Generate private top languages card
+        uses: stats-organization/github-readme-stats-action@v2
+        with:
+          card: top-langs
+          options: username=${{ github.repository_owner }}&layout=compact&langs_count=6
+          path: profile/top-langs-private.svg
+          token: ${{ secrets.GH_STATS_TOKEN }}
+          fail_on_error: true
+
+      # Commit
+      - name: Commit private card
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add profile/top-langs-private.svg
+
+          git commit -m "Update private README cards" || exit 0
+
+          git push
