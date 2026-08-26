@@ -1,0 +1,31 @@
+steps:
+  - uses: actions/checkout@v6
+
+  - name: Test private repo access
+    env:
+      GH_TOKEN: ${{ secrets.GH_STATS_TOKEN }}
+    run: |
+      echo "Testing GitHub API access..."
+
+      curl -sS \
+        -H "Authorization: Bearer $GH_TOKEN" \
+        -H "Accept: application/vnd.github+json" \
+        https://api.github.com/user \
+        | jq '{login, type}'
+
+      echo ""
+      echo "Repositories visible to token:"
+
+      curl -sS \
+        -H "Authorization: Bearer $GH_TOKEN" \
+        -H "Accept: application/vnd.github+json" \
+        "https://api.github.com/user/repos?visibility=all&per_page=100" \
+        | jq -r '.[] | "\(.private) \(.full_name)"'
+
+  - name: Generate stats card
+    uses: stats-organization/github-readme-stats-action@v2
+    with:
+      card: top-langs
+      options: username=${{ github.repository_owner }}&layout=compact&langs_count=6
+      path: profile/top-langs.svg
+      token: ${{ secrets.GH_STATS_TOKEN }}
