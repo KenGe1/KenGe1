@@ -19,7 +19,7 @@ jobs:
         uses: stats-organization/github-readme-stats-action@v2
         with:
           card: top-langs
-          options: username=${{ github.repository_owner }}&show_icons=true&count_private=true&theme=tokyonight
+          options: username=${{ github.repository_owner }}&show_icons=true&count_private=true&theme=tokyonight&hide=Lua,Objective-C%2B%2B
           path: profile/top-langs.svg
           token: ${{ secrets.GH_STATS_TOKEN }}
 
